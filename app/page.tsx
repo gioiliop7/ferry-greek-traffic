@@ -404,7 +404,6 @@ export default function FerryAnalytics() {
                         ) : (
                           <ArrowDownRight className="h-4 w-4 mr-1" />
                         )}
-                        {Math.abs(stat.growth)}%
                       </div>
                     </div>
 
