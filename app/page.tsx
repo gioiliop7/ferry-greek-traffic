@@ -38,7 +38,15 @@ import {
   Info, // Add Info icon for no data
   Search, // Add search icon
 } from "lucide-react";
-import { getTimeAnalysis } from "./lib/helpers";
+import {
+  formatDateRange,
+  getPortTraffic,
+  getRoutePassengerDistribution,
+  getRoutePerformanceData,
+  getTimeAnalysis,
+  getTotalStats,
+} from "./lib/helpers";
+import Footer from "@/components/Footer";
 
 export default function FerryAnalytics() {
   // Calculate today's date and 7 days ago
@@ -148,152 +156,11 @@ export default function FerryAnalytics() {
     setDisplayCount((prev) => Math.min(prev + 8, filteredAndSortedData.length));
   };
 
-  const getTotalStats = () => {
-    const totalPassengers = allData.reduce(
-      (sum, item) => sum + item.passengercount,
-      0
-    );
-    const totalVehicles = allData.reduce(
-      (sum, item) => sum + item.vehiclecount,
-      0
-    );
-    const totalRoutes = new Set(allData.map((item) => item.routecode)).size;
-    const totalPorts = new Set([
-      ...allData.map((item) => item.departureportname),
-      ...allData.map((item) => item.arrivalportname),
-    ]).size;
-
-    const passengerGrowth = 12.5; // Mock data
-    const vehicleGrowth = 8.3; // Mock data
-    const routeGrowth = 4.7; // Mock data
-    const portGrowth = 2.1; // Mock data
-
-    return {
-      totalPassengers,
-      totalVehicles,
-      totalRoutes,
-      totalPorts,
-      passengerGrowth,
-      vehicleGrowth,
-      routeGrowth,
-      portGrowth,
-    };
-  };
-
-  const getPortTraffic = () => {
-    const portTraffic = allData.reduce((acc, item) => {
-      const dept = item.departureportname;
-      const arr = item.arrivalportname;
-
-      if (!acc[dept])
-        acc[dept] = { departures: 0, arrivals: 0, passengers: 0, vehicles: 0 };
-      if (!acc[arr])
-        acc[arr] = { departures: 0, arrivals: 0, passengers: 0, vehicles: 0 };
-
-      acc[dept].departures += 1;
-      acc[dept].passengers += item.passengercount;
-      acc[dept].vehicles += item.vehiclecount;
-      acc[arr].arrivals += 1;
-
-      return acc;
-    }, {} as Record<string, { departures: number; arrivals: number; passengers: number; vehicles: number }>);
-
-    return Object.entries(portTraffic)
-      .map(([port, stats]) => {
-        const total = stats.departures + stats.arrivals; // Calculate total here
-        return {
-          port,
-          ...stats,
-          total: total,
-          efficiency:
-            Math.round((stats.passengers / Math.max(total, 1)) * 10) / 10,
-        };
-      })
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 10);
-  };
-
-  // Changed to passenger distribution for Pie Chart
-  const getRoutePassengerDistribution = () => {
-    const routePassengerStats = allData.reduce((acc, item) => {
-      const route = item.routecodenames;
-      if (!acc[route]) {
-        acc[route] = { passengers: 0 };
-      }
-      acc[route].passengers += item.passengercount;
-      return acc;
-    }, {} as Record<string, { passengers: number }>);
-
-    return Object.entries(routePassengerStats)
-      .map(([route, stats]) => ({
-        route,
-        passengers: stats.passengers,
-      }))
-      .sort((a, b) => b.passengers - a.passengers)
-      .slice(0, 8); // Limit to top 8 routes for readability
-  };
-
-  const getRoutePerformanceData = () => {
-    const routeStats = allData.reduce((acc, item) => {
-      const route = item.routecodenames;
-      if (!acc[route]) {
-        acc[route] = { count: 0, passengers: 0, vehicles: 0 };
-      }
-      acc[route].count += 1;
-      acc[route].passengers += item.passengercount;
-      acc[route].vehicles += item.vehiclecount;
-      return acc;
-    }, {} as Record<string, { count: number; passengers: number; vehicles: number }>);
-
-    return Object.entries(routeStats)
-      .map(([route, stats]) => ({
-        route,
-        ...stats,
-        avgPassengers: Math.round(stats.passengers / stats.count),
-        avgVehicles: Math.round(stats.vehicles / stats.count),
-      }))
-      .sort((a, b) => b.passengers - a.passengers)
-      .slice(0, 8);
-  };
-
-  const stats = getTotalStats();
-  const portTraffic = getPortTraffic();
-  const routePassengerDistribution = getRoutePassengerDistribution(); // New data for Pie
-  const routePerformanceData = getRoutePerformanceData(); // Data for Bar Chart
+  const stats = getTotalStats(allData);
+  const portTraffic = getPortTraffic(allData);
+  const routePassengerDistribution = getRoutePassengerDistribution(allData); // New data for Pie
+  const routePerformanceData = getRoutePerformanceData(allData);
   const timeAnalysis = getTimeAnalysis();
-
-  const formatDateRange = () => {
-    const from = new Date(dateRange.from);
-    const to = new Date(dateRange.to);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const fromTime = from.getTime();
-    const toTime = to.getTime();
-    const todayTime = today.getTime();
-
-    if (fromTime === toTime) {
-      if (fromTime === todayTime) {
-        return "Σημερινά Δεδομένα";
-      }
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      if (fromTime === yesterday.getTime()) {
-        return "Χθεσινά Δεδομένα";
-      }
-      return `Δεδομένα για ${from.toLocaleDateString("el-GR")}`;
-    }
-
-    const diffTime = Math.abs(toTime - fromTime);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 7) return `Τελευταίες ${diffDays + 1} Ημέρες`;
-    if (diffDays <= 30)
-      return `Τελευταίες ${Math.ceil(diffDays / 7)} Εβδομάδες`;
-    return `Περίοδος ${from.toLocaleDateString(
-      "el-GR"
-    )} έως ${to.toLocaleDateString("el-GR")}`;
-  };
 
   // Filter and sort data for the table
   const filteredAndSortedData = allData
@@ -337,7 +204,9 @@ export default function FerryAnalytics() {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   Αναλυτικά Στοιχεία Ελληνικών Πλοίων
                 </h1>
-                <p className="text-slate-500 text-sm">{formatDateRange()}</p>
+                <p className="text-slate-500 text-sm">
+                  {formatDateRange(dateRange)}
+                </p>
               </div>
             </div>
 
@@ -364,7 +233,6 @@ export default function FerryAnalytics() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Enhanced Date Range Selector */}
         <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-white/20 p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -487,7 +355,6 @@ export default function FerryAnalytics() {
           </div>
         ) : (
           <>
-            {/* Enhanced Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[
                 {
@@ -724,7 +591,6 @@ export default function FerryAnalytics() {
               </div>
             </div>
 
-            {/* Enhanced Route Performance Analysis */}
             <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-white/20 p-6 mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -736,8 +602,9 @@ export default function FerryAnalytics() {
                       Ανάλυση Απόδοσης Δρομολογίων
                     </h2>
                     <p className="text-sm text-slate-500 mt-1">
-                      Ημερήσια στατιστικά απόδοσης για {formatDateRange()} •
-                      Σύγκριση Επιβατών έναντι Οχημάτων
+                      Ημερήσια στατιστικά απόδοσης για{" "}
+                      {formatDateRange(dateRange)} • Σύγκριση Επιβατών έναντι
+                      Οχημάτων
                     </p>
                   </div>
                 </div>
@@ -746,7 +613,7 @@ export default function FerryAnalytics() {
                     Περίοδος Ανάλυσης
                   </div>
                   <div className="text-lg font-semibold text-slate-800">
-                    {formatDateRange()}
+                    {formatDateRange(dateRange)}
                   </div>
                 </div>
               </div>
@@ -845,7 +712,6 @@ export default function FerryAnalytics() {
               </ResponsiveContainer>
             </div>
 
-            {/* Enhanced Data Table */}
             <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-white/20 p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
@@ -1026,23 +892,7 @@ export default function FerryAnalytics() {
           </>
         )}
 
-        {/* Enhanced Footer */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-4 px-6 py-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/20">
-            <div className="flex items-center gap-2 text-slate-600">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm">Ζωντανά Δεδομένα</span>
-            </div>
-            <div className="w-px h-4 bg-slate-300"></div>
-            <div className="text-sm text-slate-500">
-              Με την υποστήριξη του data.gov.gr
-            </div>
-            <div className="w-px h-4 bg-slate-300"></div>
-            <div className="text-sm text-slate-500">
-              Ενημερώθηκε: {new Date().toLocaleString("el-GR")}
-            </div>
-          </div>
-        </div>
+        <Footer />
       </div>
     </div>
   );

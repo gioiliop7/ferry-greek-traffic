@@ -9,3 +9,8 @@ export interface FerryData {
   routecodenames: string;
   arrivalportname: string;
 }
+
+export interface DateRange {
+  from: string;
+  to: string;
+}
