@@ -160,7 +160,6 @@ export default function FerryAnalytics() {
   const portTraffic = getPortTraffic(allData);
   const routePassengerDistribution = getRoutePassengerDistribution(allData); // New data for Pie
   const routePerformanceData = getRoutePerformanceData(allData);
-  const timeAnalysis = getTimeAnalysis();
 
   // Filter and sort data for the table
   const filteredAndSortedData = allData
@@ -418,66 +417,6 @@ export default function FerryAnalytics() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Time Analysis Chart */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-white/20 p-6 mb-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg">
-                  <Activity className="h-5 w-5 text-white" />
-                </div>
-                <h2 className="text-xl font-semibold text-slate-800">
-                  Μοτίβο Ημερήσιας Κίνησης
-                </h2>
-                <div className="ml-auto text-sm text-slate-500">
-                  Ωριαία Κατανομή
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={timeAnalysis}>
-                  <defs>
-                    <linearGradient
-                      id="passengerGradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
-                      <stop
-                        offset="95%"
-                        stopColor="#6366f1"
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="hour" stroke="#64748b" fontSize={12} />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.9)",
-                      border: "none",
-                      borderRadius: "12px",
-                      boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
-                      backdropFilter: "blur(10px)",
-                    }}
-                    formatter={(value: number) =>
-                      `${value.toLocaleString("el-GR")} επιβάτες`
-                    }
-                    labelFormatter={(label) => `Ώρα: ${label}`}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="passengers"
-                    stroke="#6366f1"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#passengerGradient)"
-                    name="Επιβάτες"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
             </div>
 
             {/* Charts Grid */}
