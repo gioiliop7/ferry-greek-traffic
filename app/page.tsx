@@ -213,14 +213,14 @@ export default function FerryAnalytics() {
             <div className="flex items-center gap-3">
               <button
                 onClick={downloadData}
-                className="p-2 rounded-xl bg-white/60 hover:bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-200 group"
+                className="p-2 cursor-pointer rounded-xl bg-white/60 hover:bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-200 group"
                 title="Κατέβασμα Δεδομένων"
               >
                 <Download className="h-5 w-5 text-slate-600 group-hover:text-indigo-600" />
               </button>
               <button
                 onClick={handleSearch} // Use handleSearch to re-fetch with current date range
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 <RefreshCw
                   className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
@@ -334,7 +334,7 @@ export default function FerryAnalytics() {
               </label>
               <button
                 onClick={handleSearch}
-                className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 shadow-sm font-medium"
+                className="cursor-pointer w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 shadow-sm font-medium"
               >
                 Αναζήτηση Δεδομένων
               </button>
@@ -738,7 +738,7 @@ export default function FerryAnalytics() {
                       className="w-full px-4 pl-9 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 shadow-sm text-sm"
                     />
                   </div>
-                  <button className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors duration-200 w-full sm:w-auto">
+                  <button className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors duration-200 w-full sm:w-auto">
                     <Filter className="h-4 w-4" />
                     Φίλτρο
                   </button>
@@ -746,7 +746,7 @@ export default function FerryAnalytics() {
                     onClick={() =>
                       setDisplayCount(filteredAndSortedData.length)
                     }
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 w-full sm:w-auto"
+                    className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 w-full sm:w-auto"
                   >
                     <Eye className="h-4 w-4" />
                     Προβολή Όλων
@@ -875,7 +875,7 @@ export default function FerryAnalytics() {
                 {displayCount < filteredAndSortedData.length && (
                   <button
                     onClick={loadMoreData}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium"
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium"
                   >
                     <Zap className="h-4 w-4" />
                     Φόρτωση Περισσότερων Δεδομένων
